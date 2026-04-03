@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useSearchParams } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Calendar, Clock, User, Plus, X, Check, Phone, CalendarDays } from 'lucide-react'
 
@@ -29,6 +29,14 @@ interface ScheduledCall {
 }
 
 export default function CalendarPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-primary flex items-center justify-center text-slate-400">Loading...</div>}>
+      <CalendarContent />
+    </Suspense>
+  )
+}
+
+function CalendarContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
