@@ -168,34 +168,42 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json()
 
-    // Use PATCH instead of PUT - PUT requires full contact recreation
+    // Build attributes object - only include fields that are present
+    const attributes: Record<string, string> = {}
+    if (body.firstName !== undefined) attributes.FIRSTNAME = body.firstName
+    if (body.lastName !== undefined) attributes.LASTNAME = body.lastName
+    if (body.phone !== undefined) attributes.PHONE = body.phone
+    if (body.experience !== undefined) attributes.EXPERIENCE = body.experience
+    if (body.investmentRange !== undefined) attributes.INVESTMENTRANGE = body.investmentRange
+    if (body.goals !== undefined) attributes.FINANCIALGOALS = body.goals
+    if (body.referral !== undefined) attributes.REFERRALSOURCE = body.referral
+    if (body.scheduledCallDate !== undefined) attributes.SCHEDULEDCALLDATE = body.scheduledCallDate
+    if (body.scheduledCallTime !== undefined) attributes.SCHEDULEDCALLTIME = body.scheduledCallTime
+    if (body.scheduledCallNotes !== undefined) attributes.SCHEDULEDCALLNOTES = body.scheduledCallNotes
+
+    console.log(`Updating contact ${contactId} with attributes:`, JSON.stringify(attributes))
+
     const response = await fetch(`https://api.brevo.com/v3/contacts/${contactId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'api-key': brevoApiKey,
       },
-      body: JSON.stringify({
-        attributes: {
-          FIRSTNAME: body.firstName || '',
-          LASTNAME: body.lastName || '',
-          PHONE: body.phone || '',
-          EXPERIENCE: body.experience || '',
-          INVESTMENTRANGE: body.investmentRange || '',
-          FINANCIALGOALS: body.goals || '',
-          REFERRALSOURCE: body.referral || '',
-          SCHEDULEDCALLDATE: body.scheduledCallDate || '',
-          SCHEDULEDCALLTIME: body.scheduledCallTime || '',
-          SCHEDULEDCALLNOTES: body.scheduledCallNotes || '',
-        },
-      }),
+      body: JSON.stringify({ attributes }),
     })
 
+    const responseData = await response.text()
+    console.log(`Brevo PATCH response status: ${response.status}`)
+    console.log(`Brevo PATCH response body:`, responseData)
+
     if (!response.ok) {
-      const errorData = await response.json()
-      console.error('Brevo update error:', JSON.stringify(errorData))
+      let errorDetail = responseData
+      try {
+        const parsed = JSON.parse(responseData)
+        errorDetail = parsed.message || JSON.stringify(parsed)
+      } catch {}
       return NextResponse.json(
-        { error: `Failed to update contact: ${errorData.message || JSON.stringify(errorData)}` },
+        { error: `Brevo error (${response.status}): ${errorDetail}` },
         { status: 500 }
       )
     }
