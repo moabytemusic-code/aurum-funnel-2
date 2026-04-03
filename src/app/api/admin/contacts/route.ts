@@ -76,6 +76,9 @@ export async function GET(request: NextRequest) {
         investmentRange: attrs.INVESTMENTRANGE || '',
         goals: attrs.FINANCIALGOALS || '',
         referral: attrs.REFERRALSOURCE || '',
+        scheduledCallDate: attrs.SCHEDULEDCALLDATE || '',
+        scheduledCallTime: attrs.SCHEDULEDCALLTIME || '',
+        scheduledCallNotes: attrs.SCHEDULEDCALLNOTES || '',
         createdAt: contact.createdAt,
         emailBlacklisted: contact.emailBlacklisted,
         smsBlacklisted: contact.smsBlacklisted,
@@ -165,8 +168,9 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json()
 
+    // Use PATCH instead of PUT - PUT requires full contact recreation
     const response = await fetch(`https://api.brevo.com/v3/contacts/${contactId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'api-key': brevoApiKey,
@@ -180,16 +184,18 @@ export async function PATCH(request: NextRequest) {
           INVESTMENTRANGE: body.investmentRange || '',
           FINANCIALGOALS: body.goals || '',
           REFERRALSOURCE: body.referral || '',
+          SCHEDULEDCALLDATE: body.scheduledCallDate || '',
+          SCHEDULEDCALLTIME: body.scheduledCallTime || '',
+          SCHEDULEDCALLNOTES: body.scheduledCallNotes || '',
         },
-        email: body.email,
       }),
     })
 
     if (!response.ok) {
       const errorData = await response.json()
-      console.error('Brevo update error:', errorData)
+      console.error('Brevo update error:', JSON.stringify(errorData))
       return NextResponse.json(
-        { error: 'Failed to update contact' },
+        { error: `Failed to update contact: ${errorData.message || JSON.stringify(errorData)}` },
         { status: 500 }
       )
     }

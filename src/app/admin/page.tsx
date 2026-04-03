@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Mail, Phone, Calendar, DollarSign, Briefcase, MessageSquare, Search, RefreshCw, LogOut, Users, TrendingUp, Clock, Edit2, Trash2, X, Save } from 'lucide-react'
+import Link from 'next/link'
+import { Mail, Phone, Calendar, DollarSign, Briefcase, MessageSquare, Search, RefreshCw, LogOut, Users, TrendingUp, Clock, Edit2, Trash2, X, Save, CalendarDays, CalendarPlus } from 'lucide-react'
 
 interface Contact {
   id: number
@@ -199,9 +200,15 @@ export default function AdminDashboard() {
               <p className="text-sm text-slate-400">Lead Management Dashboard</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="text-slate-400 hover:text-white transition-colors text-sm">
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <Link href="/calendar" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm">
+              <CalendarDays className="w-4 h-4" />
+              Calendar
+            </Link>
+            <button onClick={handleLogout} className="text-slate-400 hover:text-white transition-colors text-sm">
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
@@ -417,6 +424,13 @@ export default function AdminDashboard() {
                           {formatDate(contact.createdAt)}
                         </div>
                         <div className="flex gap-1">
+                          <button
+                            onClick={() => window.location.href = `/calendar?contact=${contact.id}`}
+                            className="p-2 text-slate-400 hover:text-success hover:bg-success/10 rounded-lg transition-colors"
+                            title="Schedule Call"
+                          >
+                            <CalendarPlus className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={() => handleEdit(contact)}
                             className="p-2 text-slate-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors"
