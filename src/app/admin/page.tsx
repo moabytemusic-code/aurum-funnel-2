@@ -16,6 +16,7 @@ interface Contact {
   createdAt: string
   emailBlacklisted: boolean
   smsBlacklisted: boolean
+  _rawAttributes?: Record<string, any>
 }
 
 export default function AdminDashboard() {
@@ -25,6 +26,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [error, setError] = useState('')
+  const [showRaw, setShowRaw] = useState<Record<number, boolean>>({})
 
   useEffect(() => {
     // Check if already authenticated in session
@@ -262,43 +264,57 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Details Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 pt-4 border-t border-white/5">
-                  {contact.experience && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Briefcase className="w-4 h-4 text-accent flex-shrink-0" />
-                      <div>
-                        <p className="text-slate-500 text-xs">Experience</p>
-                        <p className="text-white">{contact.experience}</p>
-                      </div>
+                {/* Questionnaire Answers */}
+                <div className="grid md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/5">
+                  <div className="flex items-start gap-2 text-sm">
+                    <Briefcase className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-slate-500 text-xs">Experience</p>
+                      <p className="text-white">{contact.experience || '—'}</p>
                     </div>
-                  )}
-                  {contact.investmentRange && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <DollarSign className="w-4 h-4 text-success flex-shrink-0" />
-                      <div>
-                        <p className="text-slate-500 text-xs">Investment</p>
-                        <p className="text-white">{contact.investmentRange}</p>
-                      </div>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <DollarSign className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-slate-500 text-xs">Investment Range</p>
+                      <p className="text-white">{contact.investmentRange || '—'}</p>
                     </div>
-                  )}
-                  {contact.referral && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                      <div>
-                        <p className="text-slate-500 text-xs">Referral</p>
-                        <p className="text-white">{contact.referral}</p>
-                      </div>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <Calendar className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-slate-500 text-xs">Referral Source</p>
+                      <p className="text-white">{contact.referral || '—'}</p>
                     </div>
-                  )}
-                  {contact.goals && (
-                    <div className="flex items-start gap-2 text-sm md:col-span-2 lg:col-span-4">
-                      <MessageSquare className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-slate-500 text-xs">Goals</p>
-                        <p className="text-white">{contact.goals}</p>
-                      </div>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <Phone className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-slate-500 text-xs">Phone</p>
+                      <p className="text-white">{contact.phone || '—'}</p>
                     </div>
+                  </div>
+                  <div className="md:col-span-2 flex items-start gap-2 text-sm">
+                    <MessageSquare className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-slate-500 text-xs">Financial Goals</p>
+                      <p className="text-white">{contact.goals || '—'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Raw Data Toggle */}
+                <div className="mt-3 pt-3 border-t border-white/5">
+                  <button
+                    onClick={() => setShowRaw(prev => ({ ...prev, [contact.id]: !prev[contact.id] }))}
+                    className="text-xs text-slate-500 hover:text-accent transition-colors"
+                  >
+                    {showRaw[contact.id] ? 'Hide' : 'Show'} Raw Data
+                  </button>
+                  {showRaw[contact.id] && (
+                    <pre className="mt-2 bg-black/50 rounded-lg p-3 text-xs text-slate-400 overflow-x-auto max-h-40">
+                      {JSON.stringify(contact._rawAttributes, null, 2)}
+                    </pre>
                   )}
                 </div>
               </div>

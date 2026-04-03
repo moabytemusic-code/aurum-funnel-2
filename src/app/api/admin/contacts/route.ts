@@ -35,20 +35,25 @@ export async function GET(request: NextRequest) {
     const data = await response.json()
     
     // Transform contacts into a cleaner format
-    const contacts = data.contacts.map((contact: any) => ({
-      id: contact.id,
-      email: contact.email,
-      firstName: contact.attributes?.FIRSTNAME || '',
-      lastName: contact.attributes?.LASTNAME || '',
-      phone: contact.attributes?.PHONE || '',
-      experience: contact.attributes?.EXPERIENCE || '',
-      investmentRange: contact.attributes?.INVESTMENT_RANGE || '',
-      goals: contact.attributes?.GOALS || '',
-      referral: contact.attributes?.REFERRAL || '',
-      createdAt: contact.createdAt,
-      emailBlacklisted: contact.emailBlacklisted,
-      smsBlacklisted: contact.smsBlacklisted,
-    }))
+    const contacts = data.contacts.map((contact: any) => {
+      const attrs = contact.attributes || {}
+      return {
+        id: contact.id,
+        email: contact.email,
+        firstName: attrs.FIRSTNAME || '',
+        lastName: attrs.LASTNAME || '',
+        phone: attrs.PHONE || '',
+        experience: attrs.EXPERIENCE || '',
+        investmentRange: attrs.INVESTMENT_RANGE || '',
+        goals: attrs.GOALS || '',
+        referral: attrs.REFERRAL || '',
+        createdAt: contact.createdAt,
+        emailBlacklisted: contact.emailBlacklisted,
+        smsBlacklisted: contact.smsBlacklisted,
+        // Include all raw attributes for debugging
+        _rawAttributes: attrs,
+      }
+    })
 
     return NextResponse.json({
       success: true,
