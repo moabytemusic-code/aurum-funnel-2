@@ -12,30 +12,59 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Fetch contacts from Brevo
-    const url = listId
-      ? `https://api.brevo.com/v3/contacts/lists/${listId}/contacts?limit=100&sort=desc&order=created_at`
-      : `https://api.brevo.com/v3/contacts?limit=100&sort=desc&order=created_at`
+    // Step 1: Fetch contact list (IDs only)
+    const listUrl = listId
+      ? `https://api.brevo.com/v3/contacts/lists/${listId}/contacts?limit=100`
+      : `https://api.brevo.com/v3/contacts?limit=100`
 
-    const response = await fetch(url, {
-      headers: {
-        'api-key': brevoApiKey,
-      },
+    const listResponse = await fetch(listUrl, {
+      headers: { 'api-key': brevoApiKey },
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('Brevo fetch error:', errorData)
+    if (!listResponse.ok) {
+      const errorData = await listResponse.json()
+      console.error('Brevo list fetch error:', errorData)
       return NextResponse.json(
         { error: 'Failed to fetch contacts from Brevo' },
         { status: 500 }
       )
     }
 
-    const data = await response.json()
-    
-    // Transform contacts into a cleaner format
-    const contacts = data.contacts.map((contact: any) => {
+    const listData = await listResponse.json()
+    const contactIds = listData.contacts?.map((c: any) => c.id) || []
+
+    if (contactIds.length === 0) {
+      return NextResponse.json({
+        success: true,
+        total: 0,
+        contacts: [],
+      })
+    }
+
+    // Step 2: Fetch each contact's full details (includes attributes)
+    const contactDetails = await Promise.all(
+      contactIds.map(async (contactId: number) => {
+        try {
+          const res = await fetch(`https://api.brevo.com/v3/contacts/${contactId}`, {
+            headers: { 'api-key': brevoApiKey },
+          })
+          if (res.ok) {
+            return res.json()
+          }
+          return null
+        } catch {
+          return null
+        }
+      })
+    )
+
+    // Filter out failed fetches and sort by newest first
+    const validContacts = contactDetails
+      .filter(Boolean)
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+    // Transform contacts
+    const contacts = validContacts.map((contact: any) => {
       const attrs = contact.attributes || {}
       return {
         id: contact.id,
