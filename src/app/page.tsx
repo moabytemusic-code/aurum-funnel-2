@@ -10,7 +10,7 @@ export default function Home() {
   const [progress, setProgress] = useState(0)
 
   const videoPlatform = process.env.NEXT_PUBLIC_VIDEO_PLATFORM || 'youtube'
-  const videoId = process.env.NEXT_PUBLIC_VIDEO_ID || 'YOUR_VIDEO_ID_HERE'
+  const videoId = process.env.NEXT_PUBLIC_VIDEO_ID || 'hep0eYXJY8c'
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@theaifinancebreakdown.com'
   const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'https://calendly.com/YOUR_LINK'
 
