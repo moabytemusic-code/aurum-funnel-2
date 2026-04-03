@@ -16,7 +16,7 @@ export default function Home() {
 
   const getVideoEmbedUrl = () => {
     if (videoPlatform === 'youtube') {
-      return `https://www.youtube.com/embed/${videoId}`
+      return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&showinfo=0`
     } else if (videoPlatform === 'vimeo') {
       return `https://player.vimeo.com/video/${videoId}`
     }
@@ -136,13 +136,25 @@ export default function Home() {
 
             <div className="relative aspect-video bg-black rounded-xl overflow-hidden mb-8">
               {videoLoaded ? (
-                <iframe
-                  src={getVideoEmbedUrl()}
-                  className="absolute inset-0 w-full h-full"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                <>
+                  <iframe
+                    src={getVideoEmbedUrl()}
+                    className="absolute inset-0 w-full h-full"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                  <div className="absolute bottom-4 right-4 z-10">
+                    <a 
+                      href={`https://www.youtube.com/watch?v=${videoId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-black/80 text-white text-xs px-3 py-2 rounded-lg hover:bg-black transition-colors"
+                    >
+                      Watch on YouTube →
+                    </a>
+                  </div>
+                </>
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary">
                   <button 
