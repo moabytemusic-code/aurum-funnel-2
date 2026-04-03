@@ -1,6 +1,6 @@
-# Aurum Team Builders — Onboarding Funnel
+# Aurum Pathway — Onboarding Funnel
 
-A streamlined onboarding funnel for warm prospects interested in the Aurum Team Builders Digital Banking Ecosystem.
+A streamlined onboarding funnel for warm prospects interested in the Aurum Pathway Digital Banking Ecosystem.
 
 ## Features
 
@@ -64,4 +64,4 @@ Or connect your GitHub repo to Vercel for automatic deployments.
 
 ## License
 
-Private - Aurum Team Builders
+Private - Aurum Pathway

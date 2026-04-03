@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Aurum Team Builders | Welcome to the Onboarding Portal',
+  title: 'Aurum Pathway | Welcome to the Onboarding Portal',
   description: 'AI-Powered Digital Banking Ecosystem — Built for realistic, automated wealth growth',
 }
 

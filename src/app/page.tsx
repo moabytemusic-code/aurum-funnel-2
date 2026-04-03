@@ -78,7 +78,7 @@ export default function Home() {
       <header className="py-5 border-b border-white/10">
         <div className="container mx-auto px-4">
           <Link href="/" className="text-2xl font-bold">
-            Aurum<span className="text-accent">Team</span>Builders
+            Aurum<span className="text-accent">Pathway</span>
           </Link>
         </div>
       </header>
@@ -92,7 +92,7 @@ export default function Home() {
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent animate-slide-up">
-            You're One Step Away from<br />Accessing Aurum Team Builders
+            You're One Step Away from<br />Accessing Aurum Pathway
           </h1>
           
           <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-12 animate-slide-up" style={{ animationDelay: '0.1s' }}>
@@ -128,7 +128,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="card max-w-4xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-2">
-              🎬 Watch the Full Aurum Team Builders Breakdown
+              🎬 Watch the Full Aurum Pathway Breakdown
             </h2>
             <p className="text-slate-400 text-center mb-8">
               Everything you need to know before getting started
@@ -184,7 +184,7 @@ export default function Home() {
             {/* Skip Option */}
             <div className="text-center mt-6 pt-6 border-t border-white/10">
               <p className="text-slate-400 text-sm mb-3">
-                Already know about Aurum Team Builders?
+                Already know about Aurum Pathway?
               </p>
               <Link href="/application" className="btn-primary inline-block py-3 px-6 text-base">
                 → Skip to Application
@@ -197,7 +197,7 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-16 bg-secondary/50">
         <div className="container mx-auto px-4">
-          <h2 className="section-title">Why Choose Aurum Team Builders?</h2>
+          <h2 className="section-title">Why Choose Aurum Pathway?</h2>
           <p className="section-subtitle">
             Built by experienced professionals with a measured, realistic approach
           </p>
@@ -296,7 +296,7 @@ export default function Home() {
       <footer className="py-12 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
           <p className="text-slate-400 mb-6">
-            &copy; {new Date().getFullYear()} Aurum Team Builders. All rights reserved.
+            &copy; {new Date().getFullYear()} Aurum Pathway. All rights reserved.
           </p>
           
           <div className="bg-white/5 rounded-xl p-6 text-sm text-slate-500 max-w-3xl mx-auto mb-6">
