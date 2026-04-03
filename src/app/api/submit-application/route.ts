@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
 
     const brevoApiKey = process.env.BREVO_API_KEY
     const listId = process.env.BREVO_LIST_ID
-    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'noreply@getaifinance.com'
-    const senderName = process.env.BREVO_SENDER_NAME || 'Get AI Finance'
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'noreply@aurumteambuilders.com'
+    const senderName = process.env.BREVO_SENDER_NAME || 'Aurum Team Builders'
 
     let brevoSynced = false
     let emailSent = false
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
               name: `${firstName} ${lastName}`,
             },
           ],
-          subject: 'Welcome to Get AI Finance — Your Application is Received',
+          subject: 'Welcome to Aurum Team Builders — Your Application is Received',
           htmlContent: emailHtml,
         }),
       })
@@ -124,7 +124,7 @@ function getWelcomeEmailTemplate(firstName: string, bookingUrl: string): string 
           <!-- Header -->
           <tr>
             <td style="background:linear-gradient(135deg,#0f172a,#1e293b);padding:40px;text-align:center;">
-              <h1 style="color:#ffffff;margin:0;font-size:28px;font-weight:700;">Get<span style="color:#3b82f6;">AI</span>Finance</h1>
+              <h1 style="color:#ffffff;margin:0;font-size:28px;font-weight:700;">Aurum<span style="color:#3b82f6;">Team</span>Builders</h1>
               <p style="color:#94a3b8;margin:10px 0 0;font-size:16px;">AI-Powered Digital Banking Ecosystem</p>
             </td>
           </tr>
@@ -135,7 +135,7 @@ function getWelcomeEmailTemplate(firstName: string, bookingUrl: string): string 
               <h2 style="color:#0f172a;margin:0 0 20px;font-size:22px;">Welcome, ${firstName}! 👋</h2>
               
               <p style="color:#475569;font-size:16px;line-height:1.6;margin:0 0 20px;">
-                Thank you for your interest in Get AI Finance. We've received your application and our team is reviewing it now.
+                Thank you for your interest in Aurum Team Builders. We've received your application and our team is reviewing it now.
               </p>
               
               <p style="color:#475569;font-size:16px;line-height:1.6;margin:0 0 30px;">
@@ -183,8 +183,8 @@ function getWelcomeEmailTemplate(firstName: string, bookingUrl: string): string 
           <tr>
             <td style="background-color:#f8fafc;padding:30px;text-align:center;border-top:1px solid #e2e8f0;">
               <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0;">
-                This email was sent to you because you submitted an application through the Get AI Finance onboarding portal.<br>
-                © ${new Date().getFullYear()} Get AI Finance. All rights reserved.
+                This email was sent to you because you submitted an application through the Aurum Team Builders onboarding portal.<br>
+                © ${new Date().getFullYear()} Aurum Team Builders. All rights reserved.
               </p>
               <p style="color:#94a3b8;font-size:11px;line-height:1.6;margin:10px 0 0;">
                 Educational purposes only. No earnings claims or guarantees.

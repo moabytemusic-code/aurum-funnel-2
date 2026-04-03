@@ -1,6 +1,6 @@
-# Get AI Finance — Onboarding Funnel
+# Aurum Team Builders — Onboarding Funnel
 
-A streamlined onboarding funnel for warm prospects interested in the Get AI Finance Digital Banking Ecosystem.
+A streamlined onboarding funnel for warm prospects interested in the Aurum Team Builders Digital Banking Ecosystem.
 
 ## Features
 
@@ -64,4 +64,4 @@ Or connect your GitHub repo to Vercel for automatic deployments.
 
 ## License
 
-Private - Get AI Finance
+Private - Aurum Team Builders
