@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
             LASTNAME: lastName,
             PHONE: phone || '',
             EXPERIENCE: experience || '',
-            INVESTMENT_RANGE: investmentRange || '',
+            INVESTMENTRANGE: investmentRange || '',
             GOALS: goals || '',
             REFERRAL: referral || '',
           },

@@ -44,13 +44,12 @@ export async function GET(request: NextRequest) {
         lastName: attrs.LASTNAME || '',
         phone: attrs.PHONE || '',
         experience: attrs.EXPERIENCE || '',
-        investmentRange: attrs.INVESTMENT_RANGE || '',
+        investmentRange: attrs.INVESTMENTRANGE || '',
         goals: attrs.GOALS || '',
         referral: attrs.REFERRAL || '',
         createdAt: contact.createdAt,
         emailBlacklisted: contact.emailBlacklisted,
         smsBlacklisted: contact.smsBlacklisted,
-        // Include all raw attributes for debugging
         _rawAttributes: attrs,
       }
     })
