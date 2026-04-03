@@ -54,7 +54,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Step 2: Send welcome email via Brevo transactional API
-      const emailHtml = getWelcomeEmailTemplate(firstName)
+      const bookingUrl = process.env.BREVO_BOOKING_URL || process.env.NEXT_PUBLIC_BOOKING_URL || '#'
+      const emailHtml = getWelcomeEmailTemplate(firstName, bookingUrl)
       
       const sendEmailRes = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function getWelcomeEmailTemplate(firstName: string): string {
+function getWelcomeEmailTemplate(firstName: string, bookingUrl: string): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -169,7 +170,7 @@ function getWelcomeEmailTemplate(firstName: string): string {
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
                   <td style="background-color:#3b82f6;border-radius:8px;text-align:center;">
-                    <a href="#" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;">Book a Call →</a>
+                    <a href="${bookingUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:14px 32px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;">Book a Call →</a>
                   </td>
                 </tr>
               </table>
