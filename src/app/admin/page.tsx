@@ -200,7 +200,7 @@ export default function AdminDashboard() {
               <Users className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">AURUM Admin</h1>
+              <h1 className="text-xl font-bold">Get AI Finance Admin</h1>
               <p className="text-sm text-slate-400">Lead Management Dashboard</p>
             </div>
           </div>
