@@ -48,9 +48,11 @@ export async function POST(request: NextRequest) {
 
       if (!createContactRes.ok) {
         const errorData = await createContactRes.json()
-        console.error('Brevo contact creation error:', errorData)
+        console.error('Brevo contact creation error:', JSON.stringify(errorData))
       } else {
         brevoSynced = true
+        const contactData = await createContactRes.json()
+        console.log('Brevo contact created/updated:', JSON.stringify(contactData))
       }
 
       // Step 2: Send welcome email via Brevo transactional API

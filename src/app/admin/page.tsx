@@ -62,7 +62,7 @@ export default function AdminDashboard() {
     if (!confirm('Are you sure you want to delete this contact? This cannot be undone.')) return
     setIsDeleting(contactId)
     try {
-      const response = await fetch(`/api/admin/contacts?id=${contactId}`, {
+      const response = await fetch(`/api/admin/contacts/${contactId}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete')

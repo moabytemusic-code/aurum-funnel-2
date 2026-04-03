@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const brevoApiKey = process.env.BREVO_API_KEY
 
@@ -11,8 +14,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const { searchParams } = new URL(request.url)
-    const contactId = searchParams.get('id')
+    const contactId = params.id
 
     if (!contactId) {
       return NextResponse.json(
@@ -45,7 +47,10 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-export async function PATCH(request: NextRequest) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const brevoApiKey = process.env.BREVO_API_KEY
 
@@ -56,8 +61,7 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const { searchParams } = new URL(request.url)
-    const contactId = searchParams.get('id')
+    const contactId = params.id
 
     if (!contactId) {
       return NextResponse.json(
