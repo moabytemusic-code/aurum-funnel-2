@@ -41,19 +41,23 @@ export default function AdminDashboard() {
   const handleSave = async () => {
     if (!editingContact) return
     setIsSaving(true)
+    setError('')
     try {
-      const response = await fetch(`/api/admin/contacts/${editingContact.id}`, {
+      const response = await fetch(`/api/admin/contacts?id=${editingContact.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm),
       })
-      if (!response.ok) throw new Error('Failed to update')
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update')
+      }
       setEditingContact(null)
       setEditForm({})
       await fetchContacts()
-    } catch (err) {
+    } catch (err: any) {
       console.error('Update error:', err)
-      setError('Failed to update contact')
+      setError(err.message || 'Failed to update contact')
     } finally {
       setIsSaving(false)
     }
@@ -323,6 +327,12 @@ export default function AdminDashboard() {
                         </button>
                       </div>
                     </div>
+                    {error && (
+                      <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-red-400 text-sm break-all">
+                        <strong className="block mb-1">Error:</strong>
+                        {error}
+                      </div>
+                    )}
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs text-slate-500 mb-1 block">First Name</label>
