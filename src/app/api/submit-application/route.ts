@@ -23,75 +23,81 @@ export async function POST(request: NextRequest) {
 
     // If Brevo is configured, add contact and send email
     if (brevoApiKey && brevoApiKey !== 'your-brevo-api-key-here') {
-      // Step 1: Create or update contact
-      const createContactRes = await fetch('https://api.brevo.com/v3/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': brevoApiKey,
-        },
-        body: JSON.stringify({
-          email,
-          attributes: {
-            FIRSTNAME: firstName,
-            LASTNAME: lastName,
-            PHONE: phone || '',
-            EXPERIENCE: experience || '',
-            INVESTMENTRANGE: investmentRange || '',
-            FINANCIALGOALS: goals || '',
-            REFERRALSOURCE: referral || '',
+      try {
+        // Step 1: Create or update contact
+        const createContactRes = await fetch('https://api.brevo.com/v3/contacts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': brevoApiKey,
           },
-          listIds: listId ? [parseInt(listId)] : undefined,
-          updateEnabled: true,
-        }),
-      })
-
-      if (!createContactRes.ok) {
-        const errorData = await createContactRes.json()
-        console.error('Brevo contact creation error:', JSON.stringify(errorData))
-      } else {
-        brevoSynced = true
-        const contactData = await createContactRes.json()
-        console.log('Brevo contact created/updated:', JSON.stringify(contactData))
-      }
-
-      // Step 2: Send welcome email via Brevo transactional API
-      const bookingUrl = process.env.BREVO_BOOKING_URL || process.env.NEXT_PUBLIC_BOOKING_URL || '#'
-      const emailHtml = getWelcomeEmailTemplate(firstName, bookingUrl)
-      
-      const sendEmailRes = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': brevoApiKey,
-        },
-        body: JSON.stringify({
-          sender: {
-            name: senderName,
-            email: senderEmail,
-          },
-          to: [
-            {
-              email,
-              name: `${firstName} ${lastName}`,
+          body: JSON.stringify({
+            email,
+            attributes: {
+              FIRSTNAME: firstName,
+              LASTNAME: lastName,
+              PHONE: phone || '',
+              EXPERIENCE: experience || '',
+              INVESTMENTRANGE: investmentRange || '',
+              FINANCIALGOALS: goals || '',
+              REFERRALSOURCE: referral || '',
             },
-          ],
-          subject: 'Welcome to Aurum Pathway — Your Application is Received',
-          htmlContent: emailHtml,
-        }),
-      })
+            listIds: listId ? [parseInt(listId)] : undefined,
+            updateEnabled: true,
+          }),
+        })
 
-      if (!sendEmailRes.ok) {
-        const errorData = await sendEmailRes.json()
-        console.error('Brevo email send error:', errorData)
-      } else {
-        emailSent = true
+        if (!createContactRes.ok) {
+          const errorData = await createContactRes.json()
+          console.error('Brevo contact creation error:', JSON.stringify(errorData))
+        } else {
+          brevoSynced = true
+          const contactData = await createContactRes.json()
+          console.log('Brevo contact created/updated:', JSON.stringify(contactData))
+        }
+
+        // Step 2: Send welcome email via Brevo transactional API
+        const bookingUrl = process.env.BREVO_BOOKING_URL || process.env.NEXT_PUBLIC_BOOKING_URL || '#'
+        const emailHtml = getWelcomeEmailTemplate(firstName, bookingUrl)
+
+        const sendEmailRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': brevoApiKey,
+          },
+          body: JSON.stringify({
+            sender: {
+              name: senderName,
+              email: senderEmail,
+            },
+            to: [
+              {
+                email,
+                name: `${firstName} ${lastName}`,
+              },
+            ],
+            subject: 'Welcome to Aurum Pathway — Your Application is Received',
+            htmlContent: emailHtml,
+          }),
+        })
+
+        if (!sendEmailRes.ok) {
+          const errorData = await sendEmailRes.json()
+          console.error('Brevo email send error:', JSON.stringify(errorData))
+        } else {
+          emailSent = true
+        }
+      } catch (brevoError) {
+        // Log Brevo errors but don't fail the submission
+        console.error('Brevo integration error (submission still succeeded):', brevoError)
       }
     }
 
+    // Always return success - the application was received
     return NextResponse.json(
-      { 
-        success: true, 
+      {
+        success: true,
         message: 'Application received',
         brevoSynced,
         emailSent,
