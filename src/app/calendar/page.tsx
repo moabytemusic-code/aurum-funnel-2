@@ -52,6 +52,7 @@ function CalendarContent() {
   const [selectedTime, setSelectedTime] = useState('09:00')
   const [callNotes, setCallNotes] = useState('')
   const [showDayDetail, setShowDayDetail] = useState<string | null>(null)
+  const [hasAutoSelected, setHasAutoSelected] = useState(false)
 
   useEffect(() => {
     const auth = sessionStorage.getItem('adminAuth')
@@ -61,19 +62,20 @@ function CalendarContent() {
     }
   }, [])
 
-  // Pre-select contact from URL param
+  // Pre-select contact from URL param (only once per session)
   useEffect(() => {
-    if (isAuthenticated && contacts.length > 0) {
+    if (isAuthenticated && contacts.length > 0 && !hasAutoSelected) {
       const contactId = searchParams.get('contact')
       if (contactId) {
         const contact = contacts.find(c => c.id === Number(contactId))
         if (contact) {
           setSelectedContact(contact)
           setShowScheduleModal(true)
+          setHasAutoSelected(true)
         }
       }
     }
-  }, [isAuthenticated, contacts, searchParams])
+  }, [isAuthenticated, contacts, hasAutoSelected, searchParams])
 
   const fetchData = async () => {
     setLoading(true)
