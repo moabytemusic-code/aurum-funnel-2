@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Mail, Phone, Calendar, DollarSign, Briefcase, MessageSquare, Search, RefreshCw, LogOut, Users, TrendingUp, Clock } from 'lucide-react'
+import { Mail, Phone, Calendar, DollarSign, Briefcase, MessageSquare, Search, RefreshCw, LogOut, Users, TrendingUp, Clock, Edit2, Trash2, X, Save } from 'lucide-react'
 
 interface Contact {
   id: number
@@ -27,6 +27,58 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [error, setError] = useState('')
   const [showRaw, setShowRaw] = useState<Record<number, boolean>>({})
+  const [editingContact, setEditingContact] = useState<Contact | null>(null)
+  const [editForm, setEditForm] = useState<Partial<Contact>>({})
+  const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState<number | null>(null)
+
+  const handleEdit = (contact: Contact) => {
+    setEditingContact(contact)
+    setEditForm({ ...contact })
+  }
+
+  const handleSave = async () => {
+    if (!editingContact) return
+    setIsSaving(true)
+    try {
+      const response = await fetch(`/api/admin/contacts/${editingContact.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm),
+      })
+      if (!response.ok) throw new Error('Failed to update')
+      setEditingContact(null)
+      setEditForm({})
+      await fetchContacts()
+    } catch (err) {
+      console.error('Update error:', err)
+      setError('Failed to update contact')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleDelete = async (contactId: number) => {
+    if (!confirm('Are you sure you want to delete this contact? This cannot be undone.')) return
+    setIsDeleting(contactId)
+    try {
+      const response = await fetch(`/api/admin/contacts?id=${contactId}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) throw new Error('Failed to delete')
+      await fetchContacts()
+    } catch (err) {
+      console.error('Delete error:', err)
+      setError('Failed to delete contact')
+    } finally {
+      setIsDeleting(null)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingContact(null)
+    setEditForm({})
+  }
 
   useEffect(() => {
     // Check if already authenticated in session
@@ -241,82 +293,208 @@ export default function AdminDashboard() {
           <div className="space-y-4">
             {filteredContacts.map((contact) => (
               <div key={contact.id} className="card hover:border-accent/30 transition-all">
-                <div className="flex flex-wrap gap-4 items-start justify-between">
-                  <div className="flex-1 min-w-[200px]">
-                    <h3 className="text-lg font-semibold">
-                      {contact.firstName} {contact.lastName}
-                    </h3>
-                    <div className="flex flex-wrap gap-3 mt-2 text-sm text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Mail className="w-3.5 h-3.5" />
-                        {contact.email}
-                      </span>
-                      {contact.phone && (
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-3.5 h-3.5" />
-                          {contact.phone}
-                        </span>
+                {editingContact?.id === contact.id ? (
+                  /* Edit Form */
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-accent">Editing Contact</h3>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleSave}
+                          disabled={isSaving}
+                          className="flex items-center gap-1 bg-success hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50"
+                        >
+                          <Save className="w-3.5 h-3.5" />
+                          {isSaving ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-slate-500 mb-1 block">First Name</label>
+                        <input
+                          type="text"
+                          value={editForm.firstName || ''}
+                          onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+                          className="w-full bg-primary border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-accent focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-500 mb-1 block">Last Name</label>
+                        <input
+                          type="text"
+                          value={editForm.lastName || ''}
+                          onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                          className="w-full bg-primary border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-accent focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-500 mb-1 block">Email</label>
+                        <input
+                          type="email"
+                          value={editForm.email || ''}
+                          onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                          className="w-full bg-primary border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-accent focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-500 mb-1 block">Phone</label>
+                        <input
+                          type="text"
+                          value={editForm.phone || ''}
+                          onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                          className="w-full bg-primary border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-accent focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-500 mb-1 block">Experience</label>
+                        <input
+                          type="text"
+                          value={editForm.experience || ''}
+                          onChange={(e) => setEditForm({ ...editForm, experience: e.target.value })}
+                          className="w-full bg-primary border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-accent focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-500 mb-1 block">Investment Range</label>
+                        <input
+                          type="text"
+                          value={editForm.investmentRange || ''}
+                          onChange={(e) => setEditForm({ ...editForm, investmentRange: e.target.value })}
+                          className="w-full bg-primary border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-accent focus:outline-none"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="text-xs text-slate-500 mb-1 block">Financial Goals</label>
+                        <textarea
+                          value={editForm.goals || ''}
+                          onChange={(e) => setEditForm({ ...editForm, goals: e.target.value })}
+                          rows={2}
+                          className="w-full bg-primary border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-accent focus:outline-none resize-none"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="text-xs text-slate-500 mb-1 block">Referral Source</label>
+                        <input
+                          type="text"
+                          value={editForm.referral || ''}
+                          onChange={(e) => setEditForm({ ...editForm, referral: e.target.value })}
+                          className="w-full bg-primary border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:border-accent focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* View Mode */
+                  <>
+                    <div className="flex flex-wrap gap-4 items-start justify-between">
+                      <div className="flex-1 min-w-[200px]">
+                        <h3 className="text-lg font-semibold">
+                          {contact.firstName} {contact.lastName}
+                        </h3>
+                        <div className="flex flex-wrap gap-3 mt-2 text-sm text-slate-400">
+                          <span className="flex items-center gap-1">
+                            <Mail className="w-3.5 h-3.5" />
+                            {contact.email}
+                          </span>
+                          {contact.phone && (
+                            <span className="flex items-center gap-1">
+                              <Phone className="w-3.5 h-3.5" />
+                              {contact.phone}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right text-sm text-slate-500">
+                          {formatDate(contact.createdAt)}
+                        </div>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => handleEdit(contact)}
+                            className="p-2 text-slate-400 hover:text-accent hover:bg-accent/10 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(contact.id)}
+                            disabled={isDeleting === contact.id}
+                            className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors disabled:opacity-50"
+                            title="Delete"
+                          >
+                            {isDeleting === contact.id ? (
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Questionnaire Answers */}
+                    <div className="grid md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/5">
+                      <div className="flex items-start gap-2 text-sm">
+                        <Briefcase className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-slate-500 text-xs">Experience</p>
+                          <p className="text-white">{contact.experience || '—'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <DollarSign className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-slate-500 text-xs">Investment Range</p>
+                          <p className="text-white">{contact.investmentRange || '—'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <Calendar className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-slate-500 text-xs">Referral Source</p>
+                          <p className="text-white">{contact.referral || '—'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 text-sm">
+                        <Phone className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-slate-500 text-xs">Phone</p>
+                          <p className="text-white">{contact.phone || '—'}</p>
+                        </div>
+                      </div>
+                      <div className="md:col-span-2 flex items-start gap-2 text-sm">
+                        <MessageSquare className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-slate-500 text-xs">Financial Goals</p>
+                          <p className="text-white">{contact.goals || '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Raw Data Toggle */}
+                    <div className="mt-3 pt-3 border-t border-white/5">
+                      <button
+                        onClick={() => setShowRaw(prev => ({ ...prev, [contact.id]: !prev[contact.id] }))}
+                        className="text-xs text-slate-500 hover:text-accent transition-colors"
+                      >
+                        {showRaw[contact.id] ? 'Hide' : 'Show'} Raw Data
+                      </button>
+                      {showRaw[contact.id] && (
+                        <pre className="mt-2 bg-black/50 rounded-lg p-3 text-xs text-slate-400 overflow-x-auto max-h-40">
+                          {JSON.stringify(contact._rawAttributes, null, 2)}
+                        </pre>
                       )}
                     </div>
-                  </div>
-                  <div className="text-right text-sm text-slate-500">
-                    {formatDate(contact.createdAt)}
-                  </div>
-                </div>
-
-                {/* Questionnaire Answers */}
-                <div className="grid md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/5">
-                  <div className="flex items-start gap-2 text-sm">
-                    <Briefcase className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-slate-500 text-xs">Experience</p>
-                      <p className="text-white">{contact.experience || '—'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <DollarSign className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-slate-500 text-xs">Investment Range</p>
-                      <p className="text-white">{contact.investmentRange || '—'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <Calendar className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-slate-500 text-xs">Referral Source</p>
-                      <p className="text-white">{contact.referral || '—'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2 text-sm">
-                    <Phone className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-slate-500 text-xs">Phone</p>
-                      <p className="text-white">{contact.phone || '—'}</p>
-                    </div>
-                  </div>
-                  <div className="md:col-span-2 flex items-start gap-2 text-sm">
-                    <MessageSquare className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-slate-500 text-xs">Financial Goals</p>
-                      <p className="text-white">{contact.goals || '—'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Raw Data Toggle */}
-                <div className="mt-3 pt-3 border-t border-white/5">
-                  <button
-                    onClick={() => setShowRaw(prev => ({ ...prev, [contact.id]: !prev[contact.id] }))}
-                    className="text-xs text-slate-500 hover:text-accent transition-colors"
-                  >
-                    {showRaw[contact.id] ? 'Hide' : 'Show'} Raw Data
-                  </button>
-                  {showRaw[contact.id] && (
-                    <pre className="mt-2 bg-black/50 rounded-lg p-3 text-xs text-slate-400 overflow-x-auto max-h-40">
-                      {JSON.stringify(contact._rawAttributes, null, 2)}
-                    </pre>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
