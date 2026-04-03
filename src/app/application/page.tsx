@@ -21,11 +21,34 @@ export default function Application() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // In production, send to your backend/CRM
-    console.log('Form submitted:', formData)
-    setStep(3)
+    setIsSubmitting(true)
+    setSubmitError('')
+
+    try {
+      const response = await fetch('/api/submit-application', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Submission failed')
+      }
+
+      setStep(3)
+    } catch (error) {
+      console.error('Submission error:', error)
+      setSubmitError('Something went wrong. Please try again or contact support.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (step === 3) {
@@ -251,19 +274,27 @@ export default function Application() {
                   />
                 </div>
 
+                {submitError && (
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-red-400 text-sm">
+                    {submitError}
+                  </div>
+                )}
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <button
                     type="button"
                     onClick={() => setStep(1)}
                     className="btn-secondary"
+                    disabled={isSubmitting}
                   >
                     ← Back
                   </button>
                   <button
                     type="submit"
-                    className="btn-success"
+                    className="btn-success disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isSubmitting}
                   >
-                    Submit Application
+                    {isSubmitting ? 'Submitting...' : 'Submit Application'}
                   </button>
                 </div>
               </div>

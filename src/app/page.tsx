@@ -9,6 +9,20 @@ export default function Home() {
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [progress, setProgress] = useState(0)
 
+  const videoPlatform = process.env.NEXT_PUBLIC_VIDEO_PLATFORM || 'youtube'
+  const videoId = process.env.NEXT_PUBLIC_VIDEO_ID || 'YOUR_VIDEO_ID_HERE'
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@theaifinancebreakdown.com'
+  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || 'https://calendly.com/YOUR_LINK'
+
+  const getVideoEmbedUrl = () => {
+    if (videoPlatform === 'youtube') {
+      return `https://www.youtube.com/embed/${videoId}`
+    } else if (videoPlatform === 'vimeo') {
+      return `https://player.vimeo.com/video/${videoId}`
+    }
+    return videoId
+  }
+
   useEffect(() => {
     const handleScroll = () => {
       const winScroll = document.documentElement.scrollTop
@@ -123,7 +137,7 @@ export default function Home() {
             <div className="relative aspect-video bg-black rounded-xl overflow-hidden mb-8">
               {videoLoaded ? (
                 <iframe
-                  src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+                  src={getVideoEmbedUrl()}
                   className="absolute inset-0 w-full h-full"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -247,17 +261,21 @@ export default function Home() {
             <div className="flex flex-wrap justify-center gap-6 mb-8">
               <div className="flex items-center gap-3 text-slate-400">
                 <Mail className="w-5 h-5 text-accent" />
-                <span>support@theaifinancebreakdown.com</span>
+                <a href={`mailto:${supportEmail}`} className="hover:text-accent transition-colors">
+                  {supportEmail}
+                </a>
               </div>
               <div className="flex items-center gap-3 text-slate-400">
                 <Calendar className="w-5 h-5 text-accent" />
-                <span>Book a 10-min Call</span>
+                <a href={bookingUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
+                  Book a 10-min Call
+                </a>
               </div>
             </div>
 
-            <Link href="/application" className="btn-primary inline-block">
+            <a href={bookingUrl} target="_blank" rel="noopener noreferrer" className="btn-primary inline-block">
               Schedule a Call →
-            </Link>
+            </a>
           </div>
         </div>
       </section>
